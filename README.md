@@ -15,7 +15,9 @@ death. This bot waits for slow regime moves instead:
   Full size (100% of cash), at most one open position.
 - **Exit:** a trailing stop 0.8% below the highest close since entry, or
   120 bars after entry, or the 60-bar EMA crossing back below the 240-bar
-  EMA — whichever comes first.
+  EMA — whichever comes first. After a sell the bot waits 30 bars before
+  a fresh entry, so one whipsaw exit cannot instantly re-enter on the
+  same chop.
 
 ## Dev-window backtest (frozen 24h window in the kit)
 

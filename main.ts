@@ -37,6 +37,7 @@ const FAST_EMA = 60; // fast trend EMA, in bars
 const SLOW_EMA = 240; // slow trend EMA, in bars
 const TRAIL_BPS = 80; // trailing stop: 0.80% below the peak close since entry
 const MAX_HOLD = 120; // bars: longest a position is held
+const COOLDOWN_BARS = 30; // bars: wait after a sell before a fresh entry
 const MAX_SLIPPAGE_BPS = 100; // fills move <1% per minute on dev (max 0.64%)
 const MIN_NOTIONAL = 1000000; // 1 USDC, in quote units
 
@@ -59,6 +60,7 @@ let emaSlow: number | null = null;
 let nextId = 1;
 let peak: bigint | null = null; // highest close since entry
 let holdBars = 0;
+let lastSellBar = -1000000; // bar index of the most recent sell
 
 function ema(prev: number | null, price: number, n: number): number {
   const k = 2 / (n + 1);
@@ -99,6 +101,9 @@ function onBatch(batch: Batch): object[] {
 
   if (qty === "0") {
     // ENTRY: breakout above the 120-bar high with the slow trend up.
+    // A short cooldown after a sell keeps one whipsaw exit from instantly
+    // re-entering on the same chop.
+    if (closes.length - 1 - lastSellBar < COOLDOWN_BARS) return orders;
     const prior = closes.slice(0, -1);
     let hi = 0n;
     const start = Math.max(0, prior.length - BREAKOUT_WINDOW);
@@ -143,6 +148,7 @@ function onBatch(batch: Batch): object[] {
       qty: qty,
       max_slippage_bps: MAX_SLIPPAGE_BPS,
     });
+    lastSellBar = closes.length - 1;
     peak = null;
     holdBars = 0;
   }
