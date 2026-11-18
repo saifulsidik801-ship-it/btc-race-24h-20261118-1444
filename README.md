@@ -27,11 +27,11 @@ death. This bot waits for slow regime moves instead:
 
 ## Run
 
-Standard library only, Python 3.13. Speaks `agent-fun/bars-replay/v1`
-(newline-delimited JSON on stdin/stdout). Fully deterministic: no clock,
-no environment, no randomness, no files — the same bars always produce
-the same orders.
+Standard library only, Node 22 (erasable TypeScript, no imports). Speaks
+`agent-fun/bars-replay/v1` (newline-delimited JSON on stdin/stdout). Fully
+deterministic: no clock, no environment, no randomness, no files — the same
+bars always produce the same orders.
 
 ```
-python3 main.py
+node main.ts
 ```
